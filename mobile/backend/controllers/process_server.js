@@ -7,12 +7,9 @@ var CONTAINER_ID = process.env.PROCESS_CONTAINER_ID || 'ProcessContainer';
 var BASIC_AUTH = process.env.PROCESS_BASIC_AUTH || 'Basic cHJvY2Vzc29yOnByb2Nlc3NvciM5OQ==';
 var SERVICES_SERVER_HOST = process.env.SERVICES_SERVER_HOST || 'localhost:8080';
 
-exports.getExistingClaims = function (req, res){
-
-    console.log("Inside getExistingClaims");
-
+exports.getExistingClaims = function (req, res) {
+    console.log("Inside getExistingClaims, req: ", req);
     if (req.body) {
-
         var options = {
             url: 'http://' + PROCESS_SERVER_HOST + '/kie-server/services/rest/server/queries/processes/instances?status=1',
             headers: {
@@ -21,71 +18,45 @@ exports.getExistingClaims = function (req, res){
             },
             method: 'GET'
         };
-
-        //send request
+        console.log('options: ', options);
+        // Send request
         request(options, function (error, response, body) {
-            //console.log("BODY: ", body);
+            console.log('getExistingClaims: response: ', response);
             if (!error && response.statusCode == 200) {
-                //var data = JSON.parse(JSON.stringify(body));
-
-                console.log('BODY: ', body)
-
                 var existingClaims = [];
                 var claimCount = 0;
-                var processes =  JSON.parse(body)["process-instance"];
+                var processes = JSON.parse(body)["process-instance"];
                 var processCount = processes.length;
-
-
-                //console.log("processes: ", processes );
-
-                if (processes){
-
-                    processes.forEach(function(process) {
-
-                        loadClaimDetails(process, function(claim) {
-
-                            //console.log("found claim: ", claim);
+                if (processes && processCount > 0) {
+                    processes.forEach(function (process) {
+                        loadClaimDetails(process, function (claim) {
                             claimCount++;
-
-                            if (claim != null || claim != undefined){
-
-                                console.log("add claim: ", claim.questionnaire.id );
-
+                            if (claim != null || claim != undefined) {
+                                console.log("add claim: ", claim.questionnaire.id);
                                 claim.photos = [];
-                                // lets fix the photos
+                                // Let's fix the photos
                                 if (claim.incidentPhotoIds && claim.incidentPhotoIds.length > 0) {
                                     claim.incidentPhotoIds.forEach(function (p, i) {
                                         var link = 'http://' + SERVICES_SERVER_HOST + '/photos/' + claim.processId + '/' + p.replace(/'/g, '');
                                         claim.photos.push(link);
                                     });
                                 }
-
                                 existingClaims.push(claim);
                             }
-
-                            if (claimCount === processCount){
-                                console.log('Returning existing claims')
+                            if (claimCount === processCount) {
                                 return res.json(existingClaims);
                             }
                         });
-
-
-
                     });
-                }
-                else{
+                } else {
                     console.log("No claims found");
+                    return res.json(existingClaims);
                 }
-
-
-            }
-            else {
+            } else {
                 console.error("got an error: ", error);
-
-                return res.status(500).json({error : 'DB record retreival error!'});
+                return res.status(500).json({ error: 'error!' });
             }
         });
-
     }
 };
 
@@ -96,7 +67,7 @@ function loadClaimDetails(process, cb) {
 
     var instanceId = process[["process-instance-id"]];
 
-    console.log("found process["+instanceId+"]");
+    console.log("found process[" + instanceId + "]");
 
     var options = {
         url: 'http://' + PROCESS_SERVER_HOST + '/kie-server/services/rest/server/containers/' + CONTAINER_ID + '/processes/instances/' + instanceId + '/variables',
@@ -130,7 +101,7 @@ function loadClaimDetails(process, cb) {
 };
 
 
-exports.startProcess = function (req, res){
+exports.startProcess = function (req, res) {
 
     console.log("Inside startProcess");
 
@@ -139,51 +110,55 @@ exports.startProcess = function (req, res){
 
     console.log("claim: ", claim);  // + JSON.stringify(claim, 2, null));
 
-    var incident = {"com.redhat.vizuri.demo.domain.Incident":{
-                            "id" : incident.id,
-                            "reporterUserId" : incident.reporterUserId,
-                            "incidentType" : incident.type,
-                            "description" : incident.description,
-                            "incidentDate" : incident.incidentDate,
-                            "buildingName" : incident.buildingName,
-                            "stateCode" : incident.stateCode,
-                            "zipCode" : incident.zipCode,
-                            "severity" : incident.severity
-                        }
-                   };
+    var incident = {
+        "com.redhat.vizuri.demo.domain.Incident": {
+            "id": incident.id,
+            "reporterUserId": incident.reporterUserId,
+            "incidentType": incident.type,
+            "description": incident.description,
+            "incidentDate": incident.incidentDate,
+            "buildingName": incident.buildingName,
+            "stateCode": incident.stateCode,
+            "zipCode": incident.zipCode,
+            "severity": incident.severity
+        }
+    };
 
 
 
-    var questionnaire = {"com.redhat.vizuri.demo.domain.Questionnaire": {
-                                "id": 1,
-                                "name": claim.questionnaire.name,
-                                "questions": [],
-                                "answers": [],
-                                "completedBy": null,
-                                "completedDate": null
-                            }
-                        };
+    var questionnaire = {
+        "com.redhat.vizuri.demo.domain.Questionnaire": {
+            "id": 1,
+            "name": claim.questionnaire.name,
+            "questions": [],
+            "answers": [],
+            "completedBy": null,
+            "completedDate": null
+        }
+    };
 
-    var questionTemplate = {"questionId": "win-1",
-                            "questionnaireId": 1,
-                            "groupId": null,
-                            "description": "Is the crack larger than a quarter?",
-                            "answerType": "YES_NO",
-                            "required": false,
-                            "enabled": true,
-                            "order": 1,
-                            "options": []
-                        };
+    var questionTemplate = {
+        "questionId": "win-1",
+        "questionnaireId": 1,
+        "groupId": null,
+        "description": "Is the crack larger than a quarter?",
+        "answerType": "YES_NO",
+        "required": false,
+        "enabled": true,
+        "order": 1,
+        "options": []
+    };
 
-    var answerTemplate =  {"questionId" : "win-1",
-                           "groupId" : null,
-                           "strValue" : "No"
-                          };
+    var answerTemplate = {
+        "questionId": "win-1",
+        "groupId": null,
+        "strValue": "No"
+    };
 
     var question;
     var answer;
     // now create new instances of questions
-    claim.questionnaire.questions.forEach(function(q, i){
+    claim.questionnaire.questions.forEach(function (q, i) {
 
         question = JSON.parse(JSON.stringify(questionTemplate));
 
@@ -192,13 +167,13 @@ exports.startProcess = function (req, res){
         question.enabled = q.enabled;
         question.order = q.order;
 
-        console.log("add question["+ question.questionId+"], enabled["+question.enabled+"]");  // compact log
+        console.log("add question[" + question.questionId + "], enabled[" + question.enabled + "]");  // compact log
         //console.log("add question: " + JSON.stringify(question, null, 2) );
         questionnaire["com.redhat.vizuri.demo.domain.Questionnaire"].questions.push(question);
 
     });
 
-    claim.questionnaire.answers.forEach(function(a, i){
+    claim.questionnaire.answers.forEach(function (a, i) {
 
 
         answer = JSON.parse(JSON.stringify(answerTemplate));
@@ -206,20 +181,20 @@ exports.startProcess = function (req, res){
         answer.questionId = a.questionId;
         answer.strValue = a.strValue;
 
-        console.log("add answer["+ answer.questionId+"], value["+answer.strValue+"]");  // compact log
+        console.log("add answer[" + answer.questionId + "], value[" + answer.strValue + "]");  // compact log
         //console.log("add answer: " + JSON.stringify(answer, null, 2));    // detail log
         questionnaire["com.redhat.vizuri.demo.domain.Questionnaire"].answers.push(answer);
 
     });
 
     var msg = {
-        "incident" : incident,
+        "incident": incident,
         "questionnaire": questionnaire
     };
 
 
     //console.log("msg: ", msg);
-    console.log("msg: " +  JSON.stringify(msg, null, 2));
+    console.log("msg: " + JSON.stringify(msg, null, 2));
 
 
     var options = {
@@ -243,40 +218,42 @@ exports.startProcess = function (req, res){
             return res.json(body);
         }
         else {
-            console.error('Error happened: '+ error);
+            console.error('Error happened: ' + error);
             res.json(error);
         }
     });
 
 };
 
-exports.addPhoto = function (instanceId, fileName, source, cb){
+exports.addPhoto = function (instanceId, fileName, source, cb) {
 
     console.log("Inside addPhoto");
 
-    var updateInfo = {"photoId" : fileName,
-                      "updateSource" : source};
+    var updateInfo = {
+        "photoId": fileName,
+        "updateSource": source
+    };
 
 
     console.log("for instanceId[" + instanceId + "], updateInfo: ", updateInfo);
 
-    signalHumanTask(instanceId, "Update%20Information", function(error){
+    signalHumanTask(instanceId, "Update%20Information", function (error) {
 
-        if (!error){
+        if (!error) {
 
-            listReadyTasks (instanceId, "Update Information", function(error, taskId){
+            listReadyTasks(instanceId, "Update Information", function (error, taskId) {
 
-                if (!error){
+                if (!error) {
 
                     console.log("calling updateInformation");
-                    updateInformation (taskId, updateInfo, function(error){
+                    updateInformation(taskId, updateInfo, function (error) {
 
-                        if (!error){
+                        if (!error) {
                             console.log("Claim updated successful");
                             cb(null, "SUCCESS");
 
                         }
-                        else{
+                        else {
                             var msg = "Unable to add photo, error: " + error;
                             console.error(msg);
                             cb(msg);
@@ -284,7 +261,7 @@ exports.addPhoto = function (instanceId, fileName, source, cb){
                     });
 
                 }
-                else{
+                else {
                     var msg = "Unable to list ready tasks, error: " + error;
                     console.error(msg);
                     cb(msg);
@@ -292,7 +269,7 @@ exports.addPhoto = function (instanceId, fileName, source, cb){
 
             });
         }
-        else{
+        else {
             var msg = "Unable to signal for human task, error: " + error;
             console.error(msg);
             cb(msg);
@@ -302,7 +279,7 @@ exports.addPhoto = function (instanceId, fileName, source, cb){
 
 };
 
-exports.addComment = function (req, res){
+exports.addComment = function (req, res) {
 
     console.log("Inside addComment");
 
@@ -312,29 +289,31 @@ exports.addComment = function (req, res){
 
     var instanceId = req.params.instanceId;
 
-    var updateInfo = {"comment" : body.claimComments,
-                      "updateSource" : body.messageSource};
+    var updateInfo = {
+        "comment": body.claimComments,
+        "updateSource": body.messageSource
+    };
 
 
     console.log("for instanceId[" + instanceId + "], updateInfo: ", updateInfo);
 
-    signalHumanTask(instanceId, "Update%20Information", function(error){
+    signalHumanTask(instanceId, "Update%20Information", function (error) {
 
-        if (!error){
+        if (!error) {
 
-            listReadyTasks (instanceId, "Update Information", function(error, taskId){
+            listReadyTasks(instanceId, "Update Information", function (error, taskId) {
 
-                if (!error){
+                if (!error) {
 
                     console.log("calling updateInformation");
-                    updateInformation (taskId, updateInfo, function(error){
+                    updateInformation(taskId, updateInfo, function (error) {
 
-                        if (!error){
+                        if (!error) {
                             console.log("Claim updated successful");
                             res.json("SUCCESS");
 
                         }
-                        else{
+                        else {
                             var msg = "Unable to add comment, error: " + error;
                             console.error(msg);
                             res.json(msg);
@@ -342,7 +321,7 @@ exports.addComment = function (req, res){
                     });
 
                 }
-                else{
+                else {
                     var msg = "Unable to list ready tasks, error: " + error;
                     console.error(msg);
                     res.json();
@@ -350,7 +329,7 @@ exports.addComment = function (req, res){
 
             });
         }
-        else{
+        else {
             var msg = "Unable to signal for human task, error: " + error;
             console.error(msg);
             res.json("Unable to signal for human task, error: " + error);
@@ -375,7 +354,7 @@ exports.addComment = function (req, res){
 };
 
 //Perform Remediation
-exports.performRemediation = function (req, res){
+exports.performRemediation = function (req, res) {
 
     console.log("Inside performRemediation");
 
@@ -386,28 +365,28 @@ exports.performRemediation = function (req, res){
     var instanceId = req.params.instanceId;
     var complete = req.params.complete;
 
-    var updateInfo = {"completed" : complete};
+    var updateInfo = { "completed": complete };
 
 
     console.log("complete[" + complete + "] for instanceId[" + instanceId + "], updateInfo: ", updateInfo);
 
-    signalHumanTask(instanceId, "Perform%20Remediation", function(error){
+    signalHumanTask(instanceId, "Perform%20Remediation", function (error) {
 
-        if (!error){
+        if (!error) {
 
-            listReadyTasks (instanceId, "Perform Remediation", function(error, taskId){
+            listReadyTasks(instanceId, "Perform Remediation", function (error, taskId) {
 
-                if (!error){
+                if (!error) {
 
                     console.log("calling updateInformation");
-                    updateInformation (taskId, updateInfo, function(error){
+                    updateInformation(taskId, updateInfo, function (error) {
 
-                        if (!error){
+                        if (!error) {
                             console.log("Claim updated successful");
                             res.json("SUCCESS");
 
                         }
-                        else{
+                        else {
                             var msg = "Unable to add comment, error: " + error;
                             console.error(msg);
                             res.json(msg);
@@ -415,7 +394,7 @@ exports.performRemediation = function (req, res){
                     });
 
                 }
-                else{
+                else {
                     var msg = "Unable to list ready tasks, error: " + error;
                     console.error(msg);
                     res.json(msg);
@@ -423,7 +402,7 @@ exports.performRemediation = function (req, res){
 
             });
         }
-        else{
+        else {
             var msg = "Unable to signal for human task, error: " + error;
             console.error(msg);
             res.json(msg);
@@ -432,9 +411,9 @@ exports.performRemediation = function (req, res){
     });
 };
 
-function signalHumanTask (instanceId, type, cb){
+function signalHumanTask(instanceId, type, cb) {
 
-    console.log("Inside signalHumanTask, instanceId: " + instanceId + " type["+type+"]");
+    console.log("Inside signalHumanTask, instanceId: " + instanceId + " type[" + type + "]");
 
     var options = {
         url: 'http://' + PROCESS_SERVER_HOST + '/kie-server/services/rest/server/containers/' + CONTAINER_ID + '/processes/instances/signal/' + type + '?instanceId=' + instanceId,
@@ -457,7 +436,7 @@ function signalHumanTask (instanceId, type, cb){
             cb(null);
         }
         else {
-            console.log('Error happened: '+ error);
+            console.log('Error happened: ' + error);
             //res.json(error);
             cb(error);
         }
@@ -467,9 +446,9 @@ function signalHumanTask (instanceId, type, cb){
 }
 
 //List Ready Tasks
-function listReadyTasks (instanceId, type, cb){
+function listReadyTasks(instanceId, type, cb) {
 
-    console.log("Inside listReadyTasks for type["+type+"], instanceId: ", instanceId);
+    console.log("Inside listReadyTasks for type[" + type + "], instanceId: ", instanceId);
 
     var options = {
         url: 'http://' + PROCESS_SERVER_HOST + '/kie-server/services/rest/server/queries/tasks/instances/process/' + instanceId + '?status=Ready',
@@ -482,7 +461,7 @@ function listReadyTasks (instanceId, type, cb){
 
     //send request
     request(options, function (error, response, body) {
-      //console.log("BODY: ", body, typeof body);
+        //console.log("BODY: ", body, typeof body);
         //console.log("response: ", response);
 
         if (!error && response.statusCode == 200) {
@@ -492,15 +471,15 @@ function listReadyTasks (instanceId, type, cb){
 
             console.log("found tasks");
 
-            if (tasks != undefined){
+            if (tasks != undefined) {
 
                 // go through the list of tasks and find the 'Update Information task
-                for(var i = 0; i < tasks.length; i++){
+                for (var i = 0; i < tasks.length; i++) {
 
                     //task[i]["task-id"] === instanceId &&
 
-                    if (tasks[i]["task-name"] === type && tasks[i]["task-status"] === "Ready"){
-                        console.log("found task: " + tasks[i]["task-id"] + " for type["+type+"]");
+                    if (tasks[i]["task-name"] === type && tasks[i]["task-status"] === "Ready") {
+                        console.log("found task: " + tasks[i]["task-id"] + " for type[" + type + "]");
                         return cb(null, tasks[i]["task-id"]);
 
                     }
@@ -510,7 +489,7 @@ function listReadyTasks (instanceId, type, cb){
                 return cb(new Error("unable to find task"));
 
             }
-            else{
+            else {
                 cb(null);
             }
 
@@ -525,9 +504,9 @@ function listReadyTasks (instanceId, type, cb){
 
 }
 
-function updateInformation (taskId, updateInfo, cb){
+function updateInformation(taskId, updateInfo, cb) {
 
-    console.log("Inside updateInformation, taskId["+taskId+"], updateInfo: ", updateInfo);
+    console.log("Inside updateInformation, taskId[" + taskId + "], updateInfo: ", updateInfo);
 
     // sample updateInfo:
     // {
@@ -558,7 +537,7 @@ function updateInformation (taskId, updateInfo, cb){
             cb(null);
         }
         else {
-            console.log('Error happened: '+ error);
+            console.log('Error happened: ' + error);
             //res.json(error);
             cb(error);
         }
