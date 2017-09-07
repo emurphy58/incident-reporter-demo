@@ -3,3 +3,4 @@ target
 .settings
 .project
 vizuri-dev.log
+.DS_Store
