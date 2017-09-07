@@ -28,6 +28,8 @@ exports.getExistingClaims = function (req, res){
             if (!error && response.statusCode == 200) {
                 //var data = JSON.parse(JSON.stringify(body));
 
+                console.log('BODY: ', body)
+
                 var existingClaims = [];
                 var claimCount = 0;
                 var processes =  JSON.parse(body)["process-instance"];
@@ -62,6 +64,7 @@ exports.getExistingClaims = function (req, res){
                             }
 
                             if (claimCount === processCount){
+                                console.log('Returning existing claims')
                                 return res.json(existingClaims);
                             }
                         });
