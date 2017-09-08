@@ -104,6 +104,9 @@ function loadClaimDetails(process, cb) {
 exports.startProcess = function (req, res) {
 
     console.log("Inside startProcess");
+    
+    console.log("REQ: ", req);
+    console.log("REQ BODY: ", req.body);
 
     var claim = req.body.claim;
     var incident = claim.incident;
