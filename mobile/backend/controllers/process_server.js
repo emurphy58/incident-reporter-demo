@@ -198,7 +198,7 @@ exports.startProcess = function (req, res) {
 
 
     var options = {
-        url: 'http://' + PROCESS_SERVER_HOST + '/kie-server/services/rest/server/containers/' + CONTAINER_ID + '/processes/' + processes.report-incident + '/instances',
+        url: 'http://' + PROCESS_SERVER_HOST + '/kie-server/services/rest/server/containers/' + CONTAINER_ID + '/processes/' + JSON.parse(body)["process-instance"].report-incident + '/instances',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
