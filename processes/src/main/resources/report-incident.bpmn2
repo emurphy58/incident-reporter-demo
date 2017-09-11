@@ -654,7 +654,7 @@ kcontext.setVariable("remediationSuccessful", true);]]></bpmn2:script>
           <drools:metaValue><![CDATA[Notify Assignee]]></drools:metaValue>
         </drools:metaData>
         <drools:onEntry-script scriptFormat="http://www.java.com/java">
-          <drools:script><![CDATA[kcontext.setVariable("message",	new com.redhat.vizuri.summit17.PushNotification (		new com.redhat.vizuri.summit17.Message(String.format("Incident #%d assigned", kcontext.getProcessInstance().getId()),"default")));]]></drools:script>
+          <drools:script><![CDATA[System.err.println("Notify Assignee!"); kcontext.setVariable("message",	new com.redhat.vizuri.summit17.PushNotification (		new com.redhat.vizuri.summit17.Message(String.format("Incident #%d assigned", kcontext.getProcessInstance().getId()),"default")));]]></drools:script>
         </drools:onEntry-script>
         <drools:onExit-script scriptFormat="http://www.java.com/java">
           <drools:script><![CDATA[kcontext.setVariable("message",null);]]></drools:script>
