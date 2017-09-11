@@ -18,7 +18,7 @@ module.exports = function (app, jsonParser, upload) {
     app.post('/api/v1/bpms/add-comments/:instanceId', jsonParser, process_server.addComment);
 
     app.post('/api/v1/bpms/push-notification', function (req, res) {
-        console.log("Recieved PN", req.body);
+        console.log("Recieved PN", req);
 	    res.status(200).end();
     });
 
