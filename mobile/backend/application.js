@@ -13,10 +13,6 @@ var app = express(); // Express app
 app.use(cors()); // Enable CORS for all requests
 var jsonParser = bodyParser.json(); // Setup JSON body parser
 
-app.post('/', function (req, res) {
-	res.status(200).end();
-});
-
 require('./config/routes')(app, jsonParser, upload); // Bootstrap app routes
 
 var port = process.env.OPENSHIFT_NODEJS_PORT || 7001;

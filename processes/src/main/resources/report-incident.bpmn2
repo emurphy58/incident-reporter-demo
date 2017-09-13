@@ -115,6 +115,7 @@ remediation.setIncidentId(incident.getId());
 kcontext.setVariable("remediation", remediation);
 
 kcontext.setVariable("responderPushUrl", System.getenv("RESPONDER_PUSH_ENDPOINT"));
+System.err.println("responderPushUrl: " + System.getenv("RESPONDER_PUSH_ENDPOINT"));
 kcontext.setVariable("responderPushUser", System.getenv("RESPONDER_PUSH_USER_NAME"));
 kcontext.setVariable("responderPushSecret", System.getenv("RESPONDER_PUSH_USER_SECRET"));
 	
@@ -654,10 +655,10 @@ kcontext.setVariable("remediationSuccessful", true);]]></bpmn2:script>
           <drools:metaValue><![CDATA[Notify Assignee]]></drools:metaValue>
         </drools:metaData>
         <drools:onEntry-script scriptFormat="http://www.java.com/java">
-          <drools:script><![CDATA[kcontext.setVariable("message",	new com.redhat.vizuri.summit17.PushNotification (		new com.redhat.vizuri.summit17.Message(String.format("Incident #%d assigned", kcontext.getProcessInstance().getId()),"default")));]]></drools:script>
+          <drools:script><![CDATA[System.err.println("Notify Assignee!"); kcontext.setVariable("message",	new com.redhat.vizuri.summit17.PushNotification (		new com.redhat.vizuri.summit17.Message(String.format("Incident #%d assigned", kcontext.getProcessInstance().getId()),"default")));]]></drools:script>
         </drools:onEntry-script>
         <drools:onExit-script scriptFormat="http://www.java.com/java">
-          <drools:script><![CDATA[kcontext.setVariable("message",null);]]></drools:script>
+          <drools:script><![CDATA[kcontext.setVariable("message",null); System.err.println("responderPushUrl: " + (String) kcontext.getVariable("responderPushUrl"));]]></drools:script>
         </drools:onExit-script>
       </bpmn2:extensionElements>
       <bpmn2:incoming>_E6C90852-0004-4E27-8A9F-D788F781005A</bpmn2:incoming>
