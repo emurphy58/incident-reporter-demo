@@ -119,7 +119,7 @@ export class NewClaimComponent implements OnInit {
       }
     }
 
-    for(var i = 0; i < this.answers.length; i++) {
+    for(i = 0; i < this.answers.length; i++) {
 
       let answer: any = {};
 

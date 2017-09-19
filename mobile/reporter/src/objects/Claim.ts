@@ -1,7 +1,6 @@
 import { Incident } from './Incident'
 import { Questionnaire } from './Questionnaire'
 import { Answer } from './Answer'
-import { Comment } from './Comment'
 
 export interface Claim {
 
