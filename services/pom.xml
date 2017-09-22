@@ -10,8 +10,7 @@
 	
 	<groupId>com.redhat.vizuri.summit17</groupId>
 	<artifactId>services</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>  <!-- Remove for fat JAR deployment -->
+	<version>0.0.1-SNAPSHOT</version>  <!-- Remove for fat JAR deployment -->
 
 	<dependencies>
 		<dependency>
