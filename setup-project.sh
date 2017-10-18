@@ -78,7 +78,7 @@ oc new-app registry.access.redhat.com/jboss-processserver-6/processserver63-open
 oc expose svc/process-server
 
 #Deploy the Services Server
-oc new-app registry.access.redhat.com/jboss-webserver-3/webserver30-tomcat8-openshift~https://github.com/emurphy58/incident-reporter-demo.git --context-dir=services -e SPRING_APPLICATION_JSON='{"zuul":{"routes":{"bpm":{"url":"http://process-server-incident-demo.'$MINISHIFT_URL'", "sensitiveHeaders":"Cookie,Set-Cookie"}}},"spring":{"data":{"rest":{"base-path":"/api"}},"http":{"multipart":{"max-file-size":"10MB","max-request-size":"10MB"}}}}' --name=services-server
+oc new-app registry.access.redhat.com/jboss-webserver-3/webserver31-tomcat8-openshift~https://github.com/Vizuri/incident-reporter-demo.git --context-dir=services -e SPRING_APPLICATION_JSON='{"zuul":{"routes":{"bpm":{"url":"http://process-server-incident-demo.'$MINISHIFT_URL'", "sensitiveHeaders":"Cookie,Set-Cookie"}}},"spring":{"data":{"rest":{"base-path":"/api"}},"http":{"multipart":{"max-file-size":"10MB","max-request-size":"10MB"}}}}' --name=services-server
 oc expose svc/services-server
 
 #Deploy the Mobile Backend
