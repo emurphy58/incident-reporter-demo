@@ -36,8 +36,6 @@ oc new-project incident-demo
 
 #Deploy Nexus
 oc new-app --template=nexus3-persistent -p VOLUME_CAPACITY=25Gi
-
-#Build the domain
 NEXUS_STATUS=`oc get pods`
 echo "Waiting for Nexus to deploy"
 sleep 5
@@ -49,8 +47,10 @@ NEXUS_STATUS=`oc get pods`
 echo "."
 done
 echo "Deployment done"
-read -p "What is the URL for Nexus? (e.g. http://nexus3-incident-demo.192.168.99.100.nip.io) " NEXUS_URL
+read -p "What is the URL for Nexus? (e.g. http://nexus3-incident-demo.192.168.99.100.nip.io) NO TRAILING SLASHES!" NEXUS_URL
 MINISHIFT_URL=`echo $NEXUS_URL | cut -c29-`
+
+#Build the domain
 cd domain
 rm -rf pom.xml
 
@@ -88,7 +88,7 @@ oc new-app registry.access.redhat.com/jboss-decisionserver-6/decisionserver63-op
 oc expose svc/decision-server
 
 #Deploy the Process Server
-oc new-app registry.access.redhat.com/jboss-processserver-6/processserver63-openshift~https://github.com/emurphy58/incident-reporter-demo.git --context-dir=processes -e KIE_SERVER_USER='processor' -e KIE_SERVER_PASSWORD='processor#99' -e KIE_SERVER_BPM_UI_DISABLED=false -e KIE_SERVER_BYPASS_AUTH_USER=true -e RESPONDER_PUSH_USER_NAME=test -e RESPONDER_PUSH_USER_SECRET=test -e RESPONDER_PUSH_USER_ENDPOINT='mobile-backend-incident-demo.'$MINISHIFT_URL -e REPORTER_PUSH_USER_NAME=test -e REPORTER_PUSH_USER_SECRET=test -e REPORTER_PUSH_USER_ENDPOINT='mobile-backend-incident-demo.'$MINISHIFT_URL --name=process-server
+oc new-app registry.access.redhat.com/jboss-processserver-6/processserver63-openshift~https://github.com/emurphy58/incident-reporter-demo.git --context-dir=processes -e KIE_SERVER_USER='processor' -e KIE_SERVER_PASSWORD='processor#99' -e KIE_SERVER_BPM_UI_DISABLED=false -e KIE_SERVER_BYPASS_AUTH_USER=true -e RESPONDER_PUSH_USER_NAME=test -e RESPONDER_PUSH_USER_SECRET=test -e RESPONDER_PUSH_ENDPOINT='http://mobile-backend-incident-demo.'$MINISHIFT_URL -e REPORTER_PUSH_USER_NAME=test -e REPORTER_PUSH_USER_SECRET=test -e REPORTER_PUSH_ENDPOINT='http://mobile-backend-incident-demo.'$MINISHIFT_URL --name=process-server
 oc expose svc/process-server
 
 #Deploy the Services Server
