@@ -2,13 +2,27 @@
 
 #This script will deploy the project onto Minishift
 
-#Check if Minishift is running
+#Check requirements
 MINISHIFT_CHECK=`minishift status`
+MVN_CHECK=`mvn -version`
+OC_CHECK=`oc`
 
 if ["$MINISHIFT_CHECK" != "Running"]
 then
     echo "Error: Minishift is not currently running"
-    return 1
+    exit
+fi
+
+if [[ "$MVN_CHECK" != *"Apache Maven"* ]]
+then
+    echo "Error: Maven is not installed"
+    exit
+fi
+
+if [[ "$OC_CHECK" != *"OpenShift Client"* ]]
+then
+    echo "Error: Openshift CLI is not installed"
+    exit
 fi
 
 #Create the templates
