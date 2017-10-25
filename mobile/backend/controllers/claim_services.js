@@ -23,7 +23,7 @@ exports.addPhoto = function (req, res) {
     console.log("fileName passed by client: " + req.params.fileName);
 
     var options = {
-        url: 'http://' + SERVICES_SERVER_HOST + '/photos/' + instanceId,
+        url: 'http://' + SERVICES_SERVER_HOST + '/services-0.0.1-SNAPSHOT' + '/photos/' + instanceId,
         headers: {
             'Accept': 'application/json'
             //,'Content-Type': 'multipart/form-data'
