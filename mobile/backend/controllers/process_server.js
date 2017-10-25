@@ -63,12 +63,12 @@ exports.getExistingClaims = function (req, res) {
 
 
 function loadClaimDetails(process, cb) {
-
-    console.log("Inside loadClaimDetails);  // from process: ", process);
+    console.log('inside loadClaimDetails');
+    //console.log("Inside loadClaimDetails);  // from process: ", process);
 
     var instanceId = process[["process-instance-id"]];
 
-    console.log("found process[" + instanceId + "]");
+    //console.log("found process[" + instanceId + "]");
 
     var options = {
         url: 'http://' + PROCESS_SERVER_HOST + '/kie-server/services/rest/server/containers/' + CONTAINER_ID + '/processes/instances/' + instanceId + '/variables',
@@ -82,14 +82,14 @@ function loadClaimDetails(process, cb) {
     //send request
     request(options, function (error, response, body) {
 
-        console.log("Process claims body: ", body);
+        //console.log("Process claims body: ", body);
         //console.log("response: ", response);
 
         if (!error && response.statusCode == 200) {
 
             var claim = JSON.parse(body);
             claim.processId = instanceId;
-            console.log("found claim details for instanceId: " + instanceId);
+            //console.log("found claim details for instanceId: " + instanceId);
             cb(claim);
         }
         else {
