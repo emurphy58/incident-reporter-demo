@@ -30,6 +30,7 @@ exports.addPhoto = function (req, res) {
         },
         method: 'POST'
     };
+    console.log('photos POST url: ' + options.url);
 
     //var filePost = request.post('http://' + SERVICES_SERVER_HOST + '/photos/' + instanceId,
     var filePost = request(options, function (error, response, body) {
