@@ -8,7 +8,8 @@ var BASIC_AUTH = process.env.PROCESS_BASIC_AUTH || 'Basic cHJvY2Vzc29yOnByb2Nlc3
 var SERVICES_SERVER_HOST = process.env.SERVICES_SERVER_HOST || 'localhost:8080';
 
 exports.getExistingClaims = function (req, res) {
-    console.log("Inside getExistingClaims, req: ", req);
+    console.log('inside getExistingClaims');
+    //console.log("Inside getExistingClaims, req: ", req);
     if (req.body) {
         var options = {
             url: 'http://' + PROCESS_SERVER_HOST + '/kie-server/services/rest/server/queries/processes/instances?status=1',
@@ -18,10 +19,10 @@ exports.getExistingClaims = function (req, res) {
             },
             method: 'GET'
         };
-        console.log('options: ', options);
+        //console.log('options: ', options);
         // Send request
         request(options, function (error, response, body) {
-            console.log('getExistingClaims: response: ', response);
+            //console.log('getExistingClaims: response: ', response);
             if (!error && response.statusCode == 200) {
                 var existingClaims = [];
                 var claimCount = 0;
@@ -32,7 +33,7 @@ exports.getExistingClaims = function (req, res) {
                         loadClaimDetails(process, function (claim) {
                             claimCount++;
                             if (claim != null || claim != undefined) {
-                                console.log("add claim: ", claim.questionnaire.id);
+                                //console.log("add claim: ", claim.questionnaire.id);
                                 claim.photos = [];
                                 // Let's fix the photos
                                 if (claim.incidentPhotoIds && claim.incidentPhotoIds.length > 0) {
