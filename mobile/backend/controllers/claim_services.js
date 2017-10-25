@@ -54,10 +54,10 @@ exports.addPhoto = function (req, res) {
             });
 
         } else if (error || response.statusCode[0] == '4' || response.statusCode[0] == '5') {
-            console.error('error return flow: ' + error);
+            console.log('error return flow: ' + error);
             res.json(error);
         } else {
-            console.error('default return flow');
+            console.log('default return flow');
             res.json(body);
         }
     });
