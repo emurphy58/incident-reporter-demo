@@ -1,7 +1,6 @@
 export interface Question {
-
-    "questionId": number
-    "answerType": string
-    "description": string
-    "options": string[]
+    questionId: number;
+    answerType: string;
+    description: string;
+    options: string[];
 }

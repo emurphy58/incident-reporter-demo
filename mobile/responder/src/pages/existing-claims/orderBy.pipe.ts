@@ -1,7 +1,7 @@
 import { Pipe } from '@angular/core';
 
 @Pipe({
-    name: "orderBy"
+    name: 'orderBy'
 })
 export class OrderByPipe {
     transform(array: Array<string>, args: string): Array<string> {

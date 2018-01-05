@@ -8,13 +8,10 @@ import { ExistingClaimsComponent } from '../existing-claims/existing-claims.comp
 })
 export class HomePage {
 
-  constructor(public navCtrl: NavController) {
-
-  }
+  constructor(private navCtrl: NavController) { }
 
   onGetStarted(): void {
-
-    this.navCtrl.push(ExistingClaimsComponent)
+    this.navCtrl.push(ExistingClaimsComponent);
   }
 
 }

@@ -1,9 +1,8 @@
-import { Question } from './Question'
+import { Question } from './Question';
 
 export interface Questionnaire {
-
-    "name": string
-    "questions": [Question]
-    completedDate: Date
-    completedBy: string
+    name: string;
+    questions: Question[];
+    completedDate: Date;
+    completedBy: string;
 }
