@@ -1,6 +1,5 @@
-import { Claim } from './Claim'
+import { Claim } from './Claim';
 
 export interface Claims {
-    
-    "claims": [Claim]
+    claims: Claim[];
 }

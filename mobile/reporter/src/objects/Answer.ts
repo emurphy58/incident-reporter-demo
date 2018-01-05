@@ -1,4 +1,3 @@
 export interface Answer {
-
-    "strValue": string
+    strValue: string;
 }

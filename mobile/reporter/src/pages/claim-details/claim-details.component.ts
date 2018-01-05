@@ -1,20 +1,10 @@
-/*
-  This component controls the claim details page
-*/
-
-//Angular Imports
 import { Component, OnInit } from '@angular/core';
-
-//Ionic Imports
 import { NavController, NavParams } from 'ionic-angular';
 import { Camera, CameraOptions } from '@ionic-native/camera';
-import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
-import { File } from '@ionic-native/file';
-
-//Local Imports
-import { Claim } from '../../objects/Claim'
-import { environment } from '../../services/environment'
-import { ClaimService } from '../../services/claims.service'
+import { HTTP } from '@ionic-native/http';
+import { Claim } from '../../objects/Claim';
+import { ClaimService } from '../../services/claims.service';
+import { environment } from '../../services/environment';
 
 @Component({
   selector: 'existing-claims',
@@ -22,107 +12,63 @@ import { ClaimService } from '../../services/claims.service'
 })
 export class ClaimDetailsComponent implements OnInit {
 
-  claim: Claim
-  comment: any
+  claim: Claim;
+  comment: string;
+  feedback: string;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private camera: Camera, private claimService: ClaimService, private transfer: FileTransfer, private file: File) {
+  constructor(private navCtrl: NavController, private navParams: NavParams, private camera: Camera, private http: HTTP, private claimService: ClaimService) { }
 
-    
-  }
-
-  fileTransfer: FileTransferObject = this.transfer.create();
-
-  //This method runs while the page is loading
   ngOnInit(): void {
-
-    //Get the claim that was passed in from the existing claims page
-    this.claim = this.navParams.data
-
+    this.claim = this.navParams.data;
+    console.log(this.claim);
   }
 
-  //This method controls what the back button does
   onBack(): void {
-
-    this.navCtrl.pop()
+    this.navCtrl.pop();
   }
 
-  //This method saves a new comment to the claim
   saveComment(): void {
-
     if (this.comment) {
-
       this.claimService.POST(environment.mobileBackendUrl + '/api/v1/bpms/add-comments/' + this.claim.processId, JSON.stringify({ claimComments: this.comment, messageSource: 'reporter' })).subscribe((res) => {
-
-        if (!this.claim.comments) {
-
-          this.claim.comments = [];
+        if (!this.claim.incidentComments) {
+          this.claim.incidentComments = [];
         }
-
-        this.claim.comments.push({
-
-          message: this.comment,
-          title: '',
-          commenterName: '',
-          commentDate: new Date()
-        });
-
+        this.claim.incidentComments.push(this.comment);
         this.comment = '';
-      })
+      });
     }
   }
 
-  //This method takes a picture
   takePhoto(pictureSourceId: number): void {
-
-    let options: CameraOptions = {
-
+    const options: CameraOptions = {
       quality: 100,
-      destinationType: this.camera.DestinationType.FILE_URI,
-      sourceType: pictureSourceId,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE,
       correctOrientation: true,
-      encodingType: 0
+      sourceType: pictureSourceId
     };
 
     this.camera.getPicture(options).then((imageData) => {
+      let base64Image = 'data:image/jpeg;base64,' + imageData;
+      this.uploadBase64Image(base64Image);
+      this.camera.cleanup();
+    }, (error) => {
+      console.error(error);
+      this.camera.cleanup();
+    });
 
-      let imageUri = imageData;
-
-      if (imageUri) {
-
-        this.sendPhoto(imageUri);
-
-        this.camera.cleanup();
-      }
-    })
   }
 
-  sendPhoto(imageUri) {
-
-    let options: FileUploadOptions = {
-
-      fileKey: "file",
-      fileName: imageUri.substr(imageUri.lastIndexOf('/') + 1),
-      mimeType: "image/jpeg"
-    }
-
-    const ft: FileTransferObject = this.transfer.create();
-    ft.upload(imageUri, encodeURI(environment.mobileBackendUrl + '/api/v1/bpms/upload-photo/' + this.claim.processId + '/' + options.fileName + '/reporter'), options).then((success) => {
-
-      var responseData = JSON.parse(success.response);
-      var link = responseData.link;
-
-      if (!this.claim.photos) {
-
-        this.claim.photos = [];
+  private uploadBase64Image(base64Image: string): void {
+    this.http.post(environment.mobileBackendUrl + '/api/v1/bpms/accept-base64-image/' + this.claim.processId + '/' + 'test_file' + '/reporter', base64Image, { 'content-type': 'text/plain' }).then(res => {
+      console.log(res);
+      if (res && res.data && res.data) {
+        this.claim.photos.push(res.data);
       }
-
-      this.claim.photos.push(link);
-
-      console.log('Upload Done')
-
-    }, (err) => {
-
-      console.log
-    })
+    }).catch(error => {
+      console.error(error);
+    });
   }
+
 }

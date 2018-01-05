@@ -1,4 +1,3 @@
 export interface Comment {
-
-    "message": string
+    message: string;
 }

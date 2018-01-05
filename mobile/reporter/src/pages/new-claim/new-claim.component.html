@@ -1,12 +1,14 @@
 <ion-header>
     <ion-toolbar color="dark">
         <ion-buttons start>
-            <button *ngIf='showIncident' ion-button color="white" (click)='onClose();'><ion-icon name="close-circle"></ion-icon></button>
+            <button *ngIf='showIncident' ion-button color="white" (click)='onClose();'>
+                <ion-icon name="close-circle"></ion-icon>
+            </button>
         </ion-buttons>
         <ion-title>New Incident</ion-title>
         <ion-buttons end>
-            <button *ngIf='incident.type != null && showIncident' ion-button color="white" (click)='onSubmit();'>Submit</button>
-            <button *ngIf='loadQuestions' ion-button color="white" (click)='onFinish();'>Finish</button>
+            <button *ngIf='incident.type != null && showIncident' ion-button color="white" (click)='onSubmit()'>Submit</button>
+            <button *ngIf='loadQuestions' ion-button color="white" (click)='onFinish()'>Finish</button>
         </ion-buttons>
     </ion-toolbar>
 </ion-header>
@@ -32,7 +34,7 @@
             </ion-item>
             <ion-item>
                 <ion-label floating>Incident Date</ion-label>
-                <ion-input type="date" [(ngModel)]="incident.incidentDate"></ion-input>
+                <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="incident.incidentDate"></ion-datetime>
             </ion-item>
             <ion-item>
                 <ion-label floating>Building Name</ion-label>
